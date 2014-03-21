@@ -1,0 +1,71 @@
+
+services:
+
+    iphp.event_dispatcher:
+        class: Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+        arguments:
+            - @service_container
+
+    iphp.cli:
+        alias: iphp.cli.readline
+
+    iphp.cli.readline:
+        class: Az\iPhp\Cli\ReadlineCliHandler
+
+    iphp.task_dispatcher:
+        alias: iphp.task_dispatcher.event
+
+    iphp.task_dispatcher.event:
+        class: Az\iPhp\TaskDispatcher\EventTaskDispatcher
+        arguments:
+            - @iphp.event_dispatcher
+
+    iphp.runner:
+        alias: iphp.runner.basic
+
+    iphp.runner.basic:
+        class: Az\iPhp\Runner\BasicRunner
+        arguments:
+            - @iphp.cli
+            - @iphp.task_dispatcher
+
+    iphp.command_processor.should_buffer:
+        class: Az\iPhp\CommandProcessor\ShouldBufferProcessor
+        tags:
+            - { name: iphp.event_listener, event: iphp.input_line, method: onInputLine }
+
+    iphp.command_processor.eval:
+        class: Az\iPhp\CommandProcessor\EvalProcessor
+        tags:
+            - { name: iphp.event_listener, event: iphp.input_line, method: onInputLine }
+
+    iphp.autocompleter.array_key:
+        class: Az\iPhp\Autocompleter\ArrayKeyAutocompleter
+        tags:
+            - { name: iphp.event_listener, event: iphp.autocomplete, method: onAutocomplete }
+
+    iphp.autocompleter.variable:
+        class: Az\iPhp\Autocompleter\VariableAutocompleter
+        #tags:
+        #    - { name: iphp.event_listener, event: iphp.autocomplete, method: onAutocomplete }
+
+    iphp.autocompleter.function:
+        class: Az\iPhp\Autocompleter\FunctionAutocompleter
+        tags:
+            - { name: iphp.event_listener, event: iphp.autocomplete, method: onAutocomplete }
+
+    iphp.autocompleter.object_property:
+        class: Az\iPhp\Autocompleter\ObjectPropertyAutocompleter
+        tags:
+            - { name: iphp.event_listener, event: iphp.autocomplete, method: onAutocomplete }
+
+    iphp.autocompleter.object_static_property:
+        class: Az\iPhp\Autocompleter\ObjectStaticPropertyAutocompleter
+        tags:
+            - { name: iphp.event_listener, event: iphp.autocomplete, method: onAutocomplete }
+
+    iphp.autocompleter.class:
+        class: Az\iPhp\Autocompleter\ClassAutocompleter
+        tags:
+            - { name: iphp.event_listener, event: iphp.autocomplete, method: onAutocomplete }
+
